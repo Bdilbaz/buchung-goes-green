@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meetingraum - Buchungssystem - Ebene 4</title>
+    <script type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
+    </script>
+    <script type="text/javascript">
+       (function(){
+          emailjs.init({
+            publicKey: "X9GuFdmKVuvsCqx9Y",
+          });
+       })();
+    </script>
     <style>
         /* Grundlegende Stile für die Seite */
         body {
@@ -1131,8 +1141,33 @@
             bookingsData.push(booking);
             saveBookingsToLocalStorage();
             loadBookings();
+
+            //Sende die E-Mail bei einer erfolgreichen Buchung
+            sendBookingEmail(booking);
         }
 
+        /*Senden einer E-Mail*/
+        function sendBookingEmail(bookingData) {
+            const templateParams = {
+                title: bookingData.title,
+                name: bookingData.name,
+                email: bookingData.email,
+                department: bookingData.department,
+                startTime: bookingData.startTime,
+                endTime: bookingData.endTime,
+                participants: bookingData.participants,
+                rooms: bookingData.rooms.join(', '),
+            };
+
+            emailjs.send("service_tp6geem", "template_imwd8tm", templateParams)
+                .then(response => {
+                    console.log("E-Mail erfolgreich gesendet!", response.status, response.text);
+                })
+                .catch(error => {
+                    console.error("Fehler beim Senden der E-Mail:", error);
+                });
+        }
+        
         /* Überprüfung auf Konflikte */
         function checkForConflict(newBooking) {
             let conflicts = [];
